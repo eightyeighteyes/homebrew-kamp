@@ -11,8 +11,8 @@
 class TuneShifter < Formula
   desc "Automated audio library ingest daemon for Bandcamp downloads"
   homepage "https://github.com/eightyeighteyes/tune-shifter"
-  url "https://github.com/eightyeighteyes/tune-shifter/releases/download/v0.15.2/tune_shifter-0.15.2.tar.gz"
-  sha256 "ce16d9432f2ae60b9c1d96705ee8553adfe2cd901c08776a0e562c10b1c331af"
+  url "https://github.com/eightyeighteyes/tune-shifter/releases/download/v0.15.3/tune_shifter-0.15.3.tar.gz"
+  sha256 "682a6d3b9157bacfb3854f03b5c0da2e27c900ea145b11b5365ef42519ca0085"
 
   license "GPL-3.0-only"
 
@@ -43,6 +43,7 @@ class TuneShifter < Formula
                 "import sysconfig; print(sysconfig.get_config_var('LIBDIR') or '')").chomp
     py_ver = Utils.safe_popen_read(venv_python, "-c",
                 "import sysconfig; print(sysconfig.get_config_var('LDVERSION') or '')").chomp
+    # Compile into buildpath first; bin/ doesn't exist until bin.install creates it.
     system ENV.cc,
            buildpath/"launcher/main.c",
            "-DVENV_PYTHON=\"#{venv_python}\"",
@@ -51,7 +52,8 @@ class TuneShifter < Formula
            "-L#{lib_dir}", "-lpython#{py_ver}",
            *ldflags.split,
            "-Wno-deprecated-declarations",
-           "-o", bin/"tune-shifter"
+           "-o", buildpath/"tune-shifter"
+    bin.install buildpath/"tune-shifter"
 
     zsh_completion.install "completions/_tune-shifter"
     (share/"tune-shifter").install "USAGE.md"
